@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Login</title>
+</head>
+<body>
+    <h1>Test API FotoLjay</h1>
+    
+    <div id="results"></div>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        async function testLogin() {
+            try {
+                const response = await fetch('http://localhost:3000/api/sellers/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'amina.diop@email.com',
+                        password: 'seller123'
+                    })
+                });
+                
+                const data = await response.json();
+                results.innerHTML += `<p><strong>Login Status:</strong> ${response.status}</p>`;
+                results.innerHTML += `<p><strong>Response:</strong> ${JSON.stringify(data, null, 2)}</p>`;
+                
+                if (response.ok && data.token) {
+                    // Test get seller products
+                    const productsResponse = await fetch('http://localhost:3000/api/products/seller', {
+                        headers: {
+                            'Authorization': `Bearer ${data.token}`
+                        }
+                    });
+                    
+                    const productsData = await productsResponse.json();
+                    results.innerHTML += `<p><strong>Products Status:</strong> ${productsResponse.status}</p>`;
+                    results.innerHTML += `<p><strong>Products:</strong> ${JSON.stringify(productsData, null, 2)}</p>`;
+                }
+            } catch (error) {
+                results.innerHTML += `<p><strong>Error:</strong> ${error.message}</p>`;
+            }
+        }
+        
+        // Test automatiquement au chargement
+        testLogin();
+    </script>
+</body>
+</html>
